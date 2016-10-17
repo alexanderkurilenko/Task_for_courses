@@ -69,6 +69,7 @@ namespace Room
             Make_plan();
         }
         #endregion
+  
         public void Open_door()
         {
             door_is_open = true;
