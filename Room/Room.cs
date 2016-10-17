@@ -15,8 +15,8 @@ namespace Room
         private int length;
         private int width;
         private int free_space;
+        private PlanInConsole plan;
         public  List<Item> furniture=new List<Item>();
-        private char[,] plan;
        #endregion
        #region Properties
         public bool Light
@@ -56,8 +56,8 @@ namespace Room
             this.light_is_on=false;
             this.window_is_open=false;
             this.door_is_open=false;
-            this.plan = new char[this.length + 3, this.width + 3];
-            Make_plan();
+            this.plan = new PlanInConsole(this.length, this.width);
+            
         }
         public Room(int _length, int _width, bool _door, bool _window, bool _light)
         {
@@ -66,33 +66,32 @@ namespace Room
             this.light_is_on = _light;
             this.window_is_open =_window;
             this.door_is_open = _door;
-            Make_plan();
+            this.plan = new PlanInConsole(this.length, this.width);
+
         }
         #endregion
   
         public void Open_door()
         {
             door_is_open = true;
-            plan[1,0]='/';
+            plan.ReplaceSymbol(1, 0, '/');
         }
         public void Close_door()
         {
             door_is_open = false;
-            plan[1, 0] = '|';
+            plan.ReplaceSymbol(1, 0, '|');
         }
         public void Open_window()
         {
             window_is_open = true;
-            plan[this.length,this.width+2]='/';
-            plan[1, this.width + 2] = '/';
-
+            plan.ReplaceSymbol(this.length, this.width + 2, '/');
+            plan.ReplaceSymbol(1, this.width + 2, '/');        
         }
         public void Close_window()
         {
             window_is_open = true;
-            plan[this.length, this.width + 2] = '|';
-            plan[1, this.width + 2] = '|';
-
+            plan.ReplaceSymbol(this.length, this.width + 2, '|');
+            plan.ReplaceSymbol(1, this.width + 2, '|');
         }
         public void Light_on()
         {
@@ -116,68 +115,35 @@ namespace Room
             }
             else
             {
-                for (int i = _item.Yc + 1; i <= _item.Yc + _item.Length; i++)
-                {
-                    for (int j = _item.Xc + 1; j <= _item.Xc + _item.Width; j++)
-                    {
-                        if (plan[i, j] == ' ')
-                        {
-                            plan[i, j] = '*';
-                        }
-                        else
-                        {
-                            Exception ex = new Exception();
-                            ex.Data.Add("This space is full", DateTime.Now);
-                            throw ex;
-                        }
-                    }
-                }
+                plan.Add(_item.Yc, _item.Xc, _item.Length, _item.Width);
                 furniture.Add(_item);
             }
         }
         public void Remove(Item _item)
         {
-            for (int i = _item.Yc + 1; i <= _item.Yc + _item.Length; i++)
-            {
-                for (int j = _item.Xc + 1; j <= _item.Xc + _item.Width; j++)
-                {
-                    plan[i, j] = ' ';
-                }
-            }
+            plan.Remove(_item.Yc, _item.Xc, _item.Length, _item.Width);
             this.furniture.Remove(_item);
         }
-        public void Make_plan()
+       
+        public void Replace(Item _item, int newy, int newx)
         {
-            for (int j = 0; j < this.width + 3;j++ )
+            try
             {
-                plan[0, j] = '-';
-                plan[ this.length + 2,j] = '-';
+                Remove(_item);
+                _item.replace(newy, newx);
+                Add(_item);
             }
-            for(int i=0;i<this.length+3;i++){
-                plan[i,0] = '|';
-                plan[i,this.width + 2] = '|';
-            }
-            for (int i = 1; i < this.length + 2; i++)
+            catch (Exception ex)
             {
-                for (int j = 1; j < this.width + 2; j++)
-                {
-                    plan[i,j] = ' ';
-                }
+                Console.WriteLine("Space is not free");
 
             }
-          
+
         }
+       
         public void Show_plan()
         {
-            for (int i = 0; i < this.length + 3; i++)
-            {
-                for (int j = 0; j < this.width + 3; j++)
-                {
-                    Console.Write(plan[i, j]);
-                }
-                Console.WriteLine();
-
-            }
+            plan.ShowPlan();
         }
     }
 }

@@ -20,6 +20,7 @@ namespace Room
         public string Name
         {
             get { return this.name; }
+            set { this.name = value; }
         }
         public int Length
         {
@@ -43,7 +44,7 @@ namespace Room
         }
         #endregion
 
-        public void replace(int new_X, int new_Y)
+        public void replace(int new_Y, int new_X)
         {
             this.xc = new_X;
             this.yc = new_Y;
